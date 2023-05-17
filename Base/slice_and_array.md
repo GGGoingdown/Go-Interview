@@ -45,7 +45,7 @@ func main() {
 	s = append(s, 10)                                      // 因為 s 的容量不夠，所以會重新配置一個新的 slice
 	s1[0] = 9                                              // s not effect
 	fmt.Printf("len=%d cap=%d %v\n", len(s1), cap(s1), s1) // len=3 cap=3 [9 3 5]
-	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)    // len=3 cap=3 [9 3 5]
+	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)    // len=4 cap=6 [2 3 5, 10]
 }
 ```
 
@@ -64,6 +64,35 @@ func main() {
 	fmt.Println(copyied2)                                  // 0, because length of s2 is 0
 	fmt.Printf("len=%d cap=%d %v\n", len(s2), cap(s2), s2) // len=0 cap=3 []
 ```
+
+```go
+// pass slice as function argument
+func addValue(foo []string) {
+	foo = append(foo, "c")
+	fmt.Println("modify foo", foo)
+}
+
+func main() {
+	foo := []string{"a", "b"}
+	fmt.Println("before foo:", foo) // ["a", "b"]
+	addValue(foo) // ["a", "b", "c"]
+	fmt.Println("after foo:", foo) // ["a", "b"]
+
+	bar := foo[:1]
+	fmt.Println("bar:", bar) // ["a"], len=1, cap=2
+	s1 := append(bar, "c")
+	fmt.Println("foo:", foo) // ["a", "c"], len=2, cap=2
+	fmt.Println("s1:", s1)   // ["a", "c"], len=2, cap=2
+	s2 := append(bar, "d")
+	fmt.Println("foo:", foo) // ["a", "d"], len=2, cap=2
+	fmt.Println("s2:", s2)   // ["a", "d"], len=2, cap=2
+	s3 := append(bar, "e", "f")
+	fmt.Println("foo:", foo) // ["a", "d"], len=2, cap=2
+	fmt.Println("s3:", s3)   // ["a", "e", "f"], len=3, cap=4
+}
+
+```
+
 
 **Extend and re-slice:**
 ```go
@@ -110,7 +139,7 @@ func main() {
 	changeSlice(b)
 	fmt.Println(b) // [100 2 3]
 	changeArrayWithPointer(&a)
-	fmt.Println(a) // [1 2 3]
+	fmt.Println(a) // [69 2 3]
 }
 
 ```
@@ -131,5 +160,35 @@ func main() {
 	}
 	c := make([]int, 3) // init with zero-value
 	fmt.Printf("len=%d cap=%d %v\n", len(c), cap(c), c) // len=3 cap=3 [0 0 0]
+}
+```
+
+
+### Slice and Array iterate by range
+- `array` 是複製，所以k v值不會變動
+- `slice` 是reference，所以k v值會變動
+```go
+func foo() {
+	a := [3]int{1, 2, 3}
+	for k, v := range a { // copy
+		if k == 0 {
+			a[0], a[1] = 100, 200
+			fmt.Println(a) // [100, 200, 3]
+		}
+		a[k] = 100 + v // a[0] = 100 + 1, a[1] = 100 + 2, a[2] = 100 + 3
+	}
+	fmt.Println(a) // [101, 102, 103]
+}
+
+func bar() {
+	a := []int{1, 2, 3}
+	for k, v := range a { // reference
+		if k == 0 {
+			a[0], a[1] = 100, 200
+			fmt.Println(a) // [100, 200, 3]
+		}
+		a[k] = 100 + v // a[0] = 100 + 1, a[1] = 100 + 200, a[2] = 100 + 3
+	}
+	fmt.Println(a) // [101, 300, 103]
 }
 ```

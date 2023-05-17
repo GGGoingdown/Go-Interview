@@ -1,5 +1,6 @@
 go.mod
 main.go 
+main.py
 main_test.go
 
 .mypy_cache

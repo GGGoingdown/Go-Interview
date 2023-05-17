@@ -11,6 +11,31 @@ func main(){
 }
 ```
 
+```go
+type set map[string]struct{}
+
+func (s set) Add(k string) {
+	s[k] = struct{}{}
+}
+
+func (s set) Remove(k string) {
+	delete(s, k)
+}
+
+func (s set) Has(k string) bool {
+	_, ok := s[k]
+	return ok
+}
+
+func main() {
+	s := make(set)
+	s.Add("10")
+	fmt.Println(s.Has("10")) // true
+}
+
+```
+
+
 **類別別名(alias):**  
 把原有的類別給上一個名稱，底層還是原有的類別。
 ```go
